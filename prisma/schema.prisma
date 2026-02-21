@@ -1,0 +1,32 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Board {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  tasks     Task[]
+}
+
+model Task {
+  id        String   @id @default(cuid())
+  boardId   String
+  board     Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
+  title     String
+  status    TaskStatus
+  createdAt DateTime @default(now())
+
+  @@index([boardId])
+}
+
+enum TaskStatus {
+  todo
+  in_progress
+  done
+}
