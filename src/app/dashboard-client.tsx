@@ -3,8 +3,16 @@
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import {
+  BarChart3,
+  CheckCircle2,
+  Circle,
+  ClipboardList,
+  Clock,
+} from 'lucide-react';
 
 import type { Board, Task } from '@prisma/client';
+import type { TaskAnalytics } from '@/lib/actions';
 import type { TaskStatus } from '@/lib/types';
 import {
   createBoard,
@@ -17,9 +25,10 @@ import {
 
 type DashboardClientProps = {
   boards: Board[];
+  analytics: TaskAnalytics;
 };
 
-export function DashboardClient({ boards }: DashboardClientProps) {
+export function DashboardClient({ boards, analytics }: DashboardClientProps) {
   const router = useRouter();
   const [isCreating, startCreateTransition] = useTransition();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -81,6 +90,74 @@ export function DashboardClient({ boards }: DashboardClientProps) {
             New Board
           </button>
         </header>
+
+        {/* Option A - Analytics */}
+        <section>
+          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-400">
+            Stats
+          </h2>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+            <div className="flex items-center gap-4 rounded-xl border border-slate-800 bg-slate-900/60 p-4">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-800">
+                <ClipboardList className="h-5 w-5 text-slate-300" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-slate-50">
+                  {analytics.total}
+                </p>
+                <p className="text-xs text-slate-400">Total Tasks</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-4 rounded-xl border border-slate-800 bg-slate-900/60 p-4">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-sky-500/20">
+                <Circle className="h-5 w-5 text-sky-400" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-slate-50">
+                  {analytics.todo}
+                </p>
+                <p className="text-xs text-slate-400">To Do</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-4 rounded-xl border border-slate-800 bg-slate-900/60 p-4">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-amber-500/20">
+                <Clock className="h-5 w-5 text-amber-400" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-slate-50">
+                  {analytics.inProgress}
+                </p>
+                <p className="text-xs text-slate-400">In Progress</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-4 rounded-xl border border-slate-800 bg-slate-900/60 p-4">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-500/20">
+                <CheckCircle2 className="h-5 w-5 text-emerald-400" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-slate-50">
+                  {analytics.done}
+                </p>
+                <p className="text-xs text-slate-400">Done</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-4 rounded-xl border border-slate-800 bg-slate-900/60 p-4">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-600/20">
+                <BarChart3 className="h-5 w-5 text-emerald-500" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-slate-50">
+                  {analytics.donePercentage}%
+                </p>
+                <p className="text-xs text-slate-400">Complete</p>
+              </div>
+            </div>
+          </div>
+        </section>
 
         <section>
           {boards.length === 0 ? (

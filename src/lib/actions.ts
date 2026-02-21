@@ -62,6 +62,47 @@ export async function createBoard(
   return board;
 }
 
+export type TaskAnalytics = {
+  total: number;
+  todo: number;
+  inProgress: number;
+  done: number;
+  donePercentage: number;
+};
+
+export async function getTaskAnalytics(): Promise<TaskAnalytics> {
+  const statusCounts = await prisma.task.groupBy({
+    by: ['status'],
+    _count: { id: true },
+  });
+
+  const counts = {
+    todo: 0,
+    in_progress: 0,
+    done: 0,
+  };
+
+  for (const row of statusCounts) {
+    const key = row.status as keyof typeof counts;
+    if (key in counts) {
+      counts[key] = row._count.id;
+    }
+  }
+
+  const total =
+    counts.todo + counts.in_progress + counts.done;
+  const donePercentage =
+    total === 0 ? 0 : Math.round((counts.done / total) * 100);
+
+  return {
+    total,
+    todo: counts.todo,
+    inProgress: counts.in_progress,
+    done: counts.done,
+    donePercentage,
+  };
+}
+
 export async function getBoards() {
   const boards = await prisma.board.findMany({
     orderBy: { createdAt: 'desc' },
