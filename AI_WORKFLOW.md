@@ -6,7 +6,7 @@
 
 ## Prompts
 
-### Master Prompt (Project Initialization)
+### Master Prompt (Project Initialization): "Initialize a Next.js 14 project using the App Router, TypeScript, and Tailwind CSS. Set up Prisma with SQLite for local development. Create a schema with two tables: 'Board' (id, name, created_at) and 'Task' (id, board_id, title, status, created_at). Ensure one Board has many Tasks and use 'onDelete: Cascade' so deleting a Board deletes its Tasks. The Task status must be a string union: 'todo', 'in_progress', or 'done'."
 
 Used to bootstrap the project so the AI had full context from the start. It specified:
 
@@ -18,7 +18,10 @@ Used to bootstrap the project so the AI had full context from the start. It spec
 
 This prompt was written to be **comprehensive** so the AI understood the full data relationship (boards → tasks, cascade delete, status constraints) before writing any code.
 
-### Super Prompt (Dashboard & Board Detail Pages)
+### Prompt for Dashboard & Board Detail Pages: "Create Next.js Server Actions in a lib/actions folder for all CRUD operations:
+Boards: Create, Get All, Get One with Tasks, and Delete.
+Tasks: Create, Update Status/Title, and Delete.
+Include Zod validation for required fields and return proper error messages and status codes."
 
 Used to build the two main pages in one go. It specified:
 

@@ -4,7 +4,9 @@ A task management system with multiple boards and tasks. Each board contains mul
 
 ## Requirements
 
-- Node.js 18 or higher
+- **Node.js**: Version 18.0 or higher
+- **Package Manager**: npm 
+- **Database**: SQLite (configured for local development)
 
 ## Setup
 
@@ -37,5 +39,5 @@ A task management system with multiple boards and tasks. Each board contains mul
 
 - **Dashboard** – View all boards as cards, create new boards via a modal, and navigate to board detail.
 - **Board Detail with Task CRUD** – View a single board with three status columns (To Do, In Progress, Done); create, update (title/status), and delete tasks.
-- **Search / Filter / Sort** – Filter tasks by status (todo, in_progress, done) and sort tasks by created date (newest or oldest first).
+- **Search / Filter / Sort** – Filter tasks by status (TO DO, IN PROGRESS, DONE) and sort tasks by created date (newest or oldest first).
 - **Analytics (Option A)** – Stats section on the Dashboard showing total tasks, counts per status, and the percentage of completed (done) tasks.
