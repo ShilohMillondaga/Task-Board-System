@@ -211,11 +211,16 @@ const STATUS_COLUMNS: { id: TaskStatus; label: string; accent: string }[] = [
   { id: 'done', label: 'Done', accent: 'border-emerald-500/60' },
 ];
 
+type StatusFilter = TaskStatus | 'all';
+type SortOrder = 'newest' | 'oldest';
+
 export function BoardDetailClient({ board }: BoardDetailClientProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [title, setTitle] = useState('');
   const [status, setStatus] = useState<TaskStatus>('todo');
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
+  const [sortOrder, setSortOrder] = useState<SortOrder>('newest');
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const [editingTitle, setEditingTitle] = useState('');
 
@@ -296,8 +301,20 @@ export function BoardDetailClient({ board }: BoardDetailClientProps) {
     });
   };
 
-  const tasksByStatus = (status: TaskStatus) =>
-    board.tasks.filter((task) => task.status === status);
+  const tasksByStatus = (columnStatus: TaskStatus) => {
+    const filtered = board.tasks.filter((task) => task.status === columnStatus);
+    const sorted = [...filtered].sort((a, b) => {
+      const da = new Date(a.createdAt).getTime();
+      const db = new Date(b.createdAt).getTime();
+      return sortOrder === 'newest' ? db - da : da - db;
+    });
+    return sorted;
+  };
+
+  const columnsToShow =
+    statusFilter === 'all'
+      ? STATUS_COLUMNS
+      : STATUS_COLUMNS.filter((c) => c.id === statusFilter);
 
   return (
     <main className="min-h-screen bg-slate-950 text-slate-50">
@@ -370,8 +387,51 @@ export function BoardDetailClient({ board }: BoardDetailClientProps) {
           </form>
         </section>
 
-        <section className="grid gap-4 md:grid-cols-3">
-          {STATUS_COLUMNS.map((column) => (
+        <section className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-2">
+            <label
+              htmlFor="status-filter"
+              className="text-xs font-medium uppercase tracking-wide text-slate-400"
+            >
+              Filter
+            </label>
+            <select
+              id="status-filter"
+              value={statusFilter}
+              onChange={(e) =>
+                setStatusFilter(e.target.value as StatusFilter)
+              }
+              className="rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-50 outline-none transition focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400"
+            >
+              <option value="all">All statuses</option>
+              <option value="todo">To Do</option>
+              <option value="in_progress">In Progress</option>
+              <option value="done">Done</option>
+            </select>
+          </div>
+          <div className="flex items-center gap-2">
+            <label
+              htmlFor="sort-order"
+              className="text-xs font-medium uppercase tracking-wide text-slate-400"
+            >
+              Sort
+            </label>
+            <select
+              id="sort-order"
+              value={sortOrder}
+              onChange={(e) => setSortOrder(e.target.value as SortOrder)}
+              className="rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-50 outline-none transition focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400"
+            >
+              <option value="newest">Newest first</option>
+              <option value="oldest">Oldest first</option>
+            </select>
+          </div>
+        </section>
+
+        <section
+          className={`grid gap-4 ${columnsToShow.length === 1 ? 'md:grid-cols-1' : 'md:grid-cols-3'}`}
+        >
+          {columnsToShow.map((column) => (
             <div
               key={column.id}
               className={`flex flex-col gap-3 rounded-2xl border bg-slate-900/40 p-3 ${column.accent}`}
