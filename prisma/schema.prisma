@@ -19,14 +19,8 @@ model Task {
   boardId   String
   board     Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
   title     String
-  status    TaskStatus
+  status    String   // 'todo' | 'in_progress' | 'done'
   createdAt DateTime @default(now())
 
   @@index([boardId])
-}
-
-enum TaskStatus {
-  todo
-  in_progress
-  done
 }
