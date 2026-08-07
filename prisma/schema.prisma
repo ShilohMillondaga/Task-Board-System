@@ -4,23 +4,21 @@ generator client {
 
 datasource db {
   provider = "sqlite"
-  url      = "file:./dev.db"
+  url      = env("DATABASE_URL")
 }
 
-model Board {
-  id        String   @id @default(cuid())
-  name      String
-  createdAt DateTime @default(now())
-  tasks     Task[]
-}
+model Project {
+  id          String   @id @default(cuid())
+  clientName  String
+  projectName String
+  description String   @default("")
+  status      String   // planning | in_progress | on_hold | completed
+  priority    String   // low | medium | high
+  startDate   DateTime
+  dueDate     DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-model Task {
-  id        String   @id @default(cuid())
-  boardId   String
-  board     Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
-  title     String
-  status    String   // 'todo' | 'in_progress' | 'done'
-  createdAt DateTime @default(now())
-
-  @@index([boardId])
+  @@index([status])
+  @@index([priority])
 }

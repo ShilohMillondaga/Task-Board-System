@@ -1,11 +1,5 @@
-import { getBoards, getTaskAnalytics } from '@/lib/actions';
-import { DashboardClient } from './dashboard-client';
+import { ProjectsClient } from './projects-client';
 
-export default async function Home() {
-  const [boards, analytics] = await Promise.all([
-    getBoards(),
-    getTaskAnalytics(),
-  ]);
-
-  return <DashboardClient boards={boards} analytics={analytics} />;
+export default function Home() {
+  return <ProjectsClient />;
 }

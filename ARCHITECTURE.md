@@ -1,31 +1,52 @@
 # Architecture
 
+## Overview
+
+Client Project Tracker is a Next.js full-stack application with a REST API backend and a React client UI.
+
 ## Tech Choices
 
-- **App Router** for modern server-side rendering and clear route structure.
-- **SQLite with Prisma** for rapid local development and easy portability (single file DB, no separate server).
+- **Next.js 14 App Router** — Unified frontend and API in one codebase
+- **SQLite + Prisma** — Simple local development with typed database access
+- **Zod** — Runtime validation with structured error responses
+- **Tailwind CSS** — Utility-first styling for the dashboard UI
 
-## Data Structure
+## Data Model
 
-- **Board → Task** is a one-to-many relationship: one board has many tasks.
-- **`onDelete: Cascade`** is set on the Task–Board relation so that when a board is deleted, all its tasks are removed automatically.
+The `Project` model stores all required fields:
+
+- `id`, `clientName`, `projectName`, `description`
+- `status` (`planning` | `in_progress` | `on_hold` | `completed`)
+- `priority` (`low` | `medium` | `high`)
+- `startDate`, `dueDate`, `createdAt`, `updatedAt`
+
+Indexes on `status` and `priority` support filtering at scale.
 
 ## API Design
 
-- **Next.js Server Actions** are used instead of API routes so that:
-  - Logic stays co-located with the components that use it.
-  - Boilerplate is reduced (no route handlers, request/response wiring, or separate client fetch code).
+REST endpoints under `/api/projects`:
+
+| Method | Route | Handler |
+|--------|-------|---------|
+| GET | `/api/projects` | List all projects |
+| POST | `/api/projects` | Create project |
+| GET | `/api/projects/[id]` | Get one project |
+| PUT | `/api/projects/[id]` | Update project |
+| DELETE | `/api/projects/[id]` | Delete project |
+
+Validation runs in route handlers via shared Zod schemas. Invalid input returns `400` with field-level errors.
 
 ## Frontend Organization
 
-- Structure follows the **Next.js App Router** filesystem (`app/`, `app/board/[id]/`, etc.).
-- **State management** is kept minimal: Server Actions plus **`router.refresh()`** after mutations so the UI reflects the latest data. No global store (e.g. Redux/Zustand) is used.
+- `page.tsx` — Server entry point
+- `projects-client.tsx` — Client component with list, modals, search/filter/sort
+- `lib/project-api.ts` — Fetch wrapper for the REST API
 
-## Future Improvements and Considerations
+The UI consumes the same REST API that external clients would use, keeping concerns separated.
 
-With more time, planned additions would include:
+## Future Improvements
 
-- **Drag-and-drop** for moving tasks between status columns (e.g. todo → in progress → done).
-- **User authentication** so boards and tasks can be scoped per user.
-- **Data exporting** for downloading all board data as a JSON or CSV file
-
+- Authentication and per-user project scoping
+- Server-side pagination and query params on list endpoint
+- PostgreSQL for production deployments
+- Unit/integration tests for validation and routes
